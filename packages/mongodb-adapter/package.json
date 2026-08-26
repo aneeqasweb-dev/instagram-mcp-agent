@@ -1,0 +1,22 @@
+{
+  "name": "@instagram-agent/mongodb-adapter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test src/**/*.test.ts"
+  },
+  "dependencies": {
+    "@instagram-agent/agent-core": "0.1.0",
+    "@instagram-agent/contracts": "0.1.0",
+    "mongodb": "7.5.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.0.0"
+  }
+}

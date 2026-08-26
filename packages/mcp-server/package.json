@@ -1,0 +1,26 @@
+{
+  "name": "@instagram-agent/mcp-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "tsx watch src/stdio.ts",
+    "start": "node dist/stdio.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test src/**/*.test.ts"
+  },
+  "dependencies": {
+    "@instagram-agent/agent-core": "0.1.0",
+    "@instagram-agent/contracts": "0.1.0",
+    "@instagram-agent/mongodb-adapter": "0.1.0",
+    "@instagram-agent/playwright-adapter": "0.1.0",
+    "@modelcontextprotocol/server": "2.0.0",
+    "mongodb": "7.5.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": { "tsx": "^4.0.0" }
+}

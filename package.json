@@ -1,0 +1,31 @@
+{
+  "name": "instagram-mcp-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,dashboard \"npm run dev -w @instagram-agent/api\" \"npm run dev -w @instagram-agent/dashboard\"",
+    "prebuild": "npm run build -w @instagram-agent/contracts && npm run build -w @instagram-agent/agent-core && npm run build -w @instagram-agent/comment-analysis && npm run build -w @instagram-agent/playwright-adapter && npm run build -w @instagram-agent/mcp-client && npm run build -w @instagram-agent/mongodb-adapter && npm run build -w @instagram-agent/ollama-adapter",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run prebuild && npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:coverage": "tsx --test --experimental-test-coverage --test-coverage-lines=95 --test-coverage-branches=80 --test-coverage-functions=85 packages/agent-core/src/**/*.test.ts",
+    "security:scan": "node scripts/secret-scan.mjs && npm audit --audit-level=high",
+    "check": "npm run typecheck && npm run lint && npm test && npm run security:scan && npm run build",
+    "verify:release": "npm run check && npm run test:coverage && node scripts/release-readiness.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "concurrently": "^9.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.9.0"
+  }
+}
