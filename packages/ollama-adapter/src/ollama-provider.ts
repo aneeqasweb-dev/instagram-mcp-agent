@@ -19,6 +19,14 @@ export interface OllamaProviderOptions {
   readonly fetch?: typeof fetch;
 }
 
+let ollamaDecisionQueue: Promise<void> = Promise.resolve();
+
+function serializeOllamaDecision<T>(operation: () => Promise<T>): Promise<T> {
+  const result = ollamaDecisionQueue.then(operation, operation);
+  ollamaDecisionQueue = result.then(() => undefined, () => undefined);
+  return result;
+}
+
 function combinedSignal(signal: AbortSignal | undefined, timeoutMs: number): AbortSignal {
   return signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs);
 }
@@ -48,6 +56,10 @@ export class OllamaProvider implements LlmProvider {
   }
 
   async generateDecision(request: LlmDecisionRequest, signal?: AbortSignal): Promise<LlmDecisionResponse> {
+    return serializeOllamaDecision(() => this.#generateDecision(request, signal));
+  }
+
+  async #generateDecision(request: LlmDecisionRequest, signal?: AbortSignal): Promise<LlmDecisionResponse> {
     let messages = [...request.messages];
     let invalidOutput = "";
     for (let attempt = 0; attempt <= this.#correctionRetries; attempt += 1) {
@@ -82,7 +94,7 @@ export class OllamaProvider implements LlmProvider {
       const call = (format: unknown, requestMessages = messages) => this.#fetch(`${this.#baseUrl}/api/chat`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ model: this.#model, messages: requestMessages, stream: false, format, options: { temperature: request.temperature ?? 0 } }),
+        body: JSON.stringify({ model: this.#model, messages: requestMessages, stream: false, format, keep_alive: "30m", options: { temperature: request.temperature ?? 0, num_predict: 192 } }),
         signal: combinedSignal(signal, this.#timeoutMs),
       });
       let response = await call(request.decisionSchema);

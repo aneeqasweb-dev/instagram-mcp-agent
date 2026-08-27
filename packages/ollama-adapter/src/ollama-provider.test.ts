@@ -16,17 +16,22 @@ function jsonResponse(body: unknown, status = 200): Response {
 }
 
 test("returns a provider-neutral validated decision", async () => {
+  let options: Record<string, unknown> | undefined;
   const provider = new OllamaProvider({
     baseUrl: "http://ollama.test", model: "test-model",
-    fetch: async () => jsonResponse({
-      model: "test-model",
-      message: { content: JSON.stringify({ kind: "complete", summary: "Done", evidence: ["step-1"], rationaleSummary: "Evidence satisfies the goal", userMessage: "Done" }) },
-      prompt_eval_count: 12, eval_count: 8, total_duration: 25_000_000,
-    }),
+    fetch: async (_url, init) => {
+      options = (JSON.parse(String(init?.body)) as { options: Record<string, unknown> }).options;
+      return jsonResponse({
+        model: "test-model",
+        message: { content: JSON.stringify({ kind: "complete", summary: "Done", evidence: ["step-1"], rationaleSummary: "Evidence satisfies the goal", userMessage: "Done" }) },
+        prompt_eval_count: 12, eval_count: 8, total_duration: 25_000_000,
+      });
+    },
   });
   const result = await provider.generateDecision(request);
   assert.deepEqual(result.decision, { kind: "complete", summary: "Done", evidence: ["step-1"], rationaleSummary: "Evidence satisfies the goal", userMessage: "Done" });
   assert.deepEqual(result.usage, { inputTokens: 12, outputTokens: 8, totalDurationMs: 25 });
+  assert.deepEqual(options, { temperature: 0, num_predict: 192 });
 });
 
 test("falls back to legacy JSON mode while retaining local schema validation", async () => {
