@@ -31,7 +31,7 @@ test("returns a provider-neutral validated decision", async () => {
   const result = await provider.generateDecision(request);
   assert.deepEqual(result.decision, { kind: "complete", summary: "Done", evidence: ["step-1"], rationaleSummary: "Evidence satisfies the goal", userMessage: "Done" });
   assert.deepEqual(result.usage, { inputTokens: 12, outputTokens: 8, totalDurationMs: 25 });
-  assert.deepEqual(options, { temperature: 0, num_predict: 192 });
+  assert.deepEqual(options, { temperature: 0, num_predict: 96 });
 });
 
 test("falls back to legacy JSON mode while retaining local schema validation", async () => {

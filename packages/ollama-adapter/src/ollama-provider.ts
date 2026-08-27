@@ -94,7 +94,7 @@ export class OllamaProvider implements LlmProvider {
       const call = (format: unknown, requestMessages = messages) => this.#fetch(`${this.#baseUrl}/api/chat`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ model: this.#model, messages: requestMessages, stream: false, format, keep_alive: "30m", options: { temperature: request.temperature ?? 0, num_predict: 192 } }),
+        body: JSON.stringify({ model: this.#model, messages: requestMessages, stream: false, format, keep_alive: "30m", options: { temperature: request.temperature ?? 0, num_predict: 96 } }),
         signal: combinedSignal(signal, this.#timeoutMs),
       });
       let response = await call(request.decisionSchema);
